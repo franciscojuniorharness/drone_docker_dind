@@ -28,7 +28,7 @@ steps:
   #Contenedor necesario para ejecutar los pasos del build (cmd:...)
     build_image: jtim/docker-docker-compose-jdk-mvn:20.10.5-compose-1.28.6-adoptopenjdk-11-maven-3.6.3
   #Pasos separados por && en vez de salto de línea y cmd en vez de commands
-    cmd: sleep 15 && mvn --settings settings.xml -B clean dependency:copy-dependencies && mvn --settings settings.xml -B verify -DiTests
+    cmd: sleep 15 && docker ps
   volumes:
   - name: dockersock
     path: /var/run
