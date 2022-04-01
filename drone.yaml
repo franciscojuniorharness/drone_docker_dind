@@ -1,0 +1,46 @@
+kind: pipeline
+type: docker
+name: POC Service Guinea
+#steps:
+#- name: Maven Build
+#  image: jtim/docker-docker-compose-jdk-mvn:20.10.5-compose-1.28.6-adoptopenjdk-11-maven-3.6.3
+#  commands:
+#  - env
+#  - mvn --settings settings.xml -B clean dependency:copy-dependencies 
+#  - mvn --settings settings.xml -B verify -DiTests
+#  environment:
+#    ACCESS_ID:
+#      from_secret: ACCESS_ID
+#    SECRET_ACCESS_KEY:
+#      from_secret: SECRET_ACCESS_KEY
+
+steps:
+- name: Maven Build
+  #Imagen de plugin dind
+  image: quay.io/testcontainers/dind-drone-plugin
+  environment:
+    CI_WORKSPACE: "/drone/src"
+    ACCESS_ID:
+      from_secret: ACCESS_ID
+    SECRET_ACCESS_KEY:
+      from_secret: SECRET_ACCESS_KEY
+  settings:
+  #Contenedor necesario para ejecutar los pasos del build (cmd:...)
+    build_image: jtim/docker-docker-compose-jdk-mvn:20.10.5-compose-1.28.6-adoptopenjdk-11-maven-3.6.3
+  #Pasos separados por && en vez de salto de línea y cmd en vez de commands
+    cmd: sleep 15 && mvn --settings settings.xml -B clean dependency:copy-dependencies && mvn --settings settings.xml -B verify -DiTests
+  volumes:
+  - name: dockersock
+    path: /var/run
+
+services:
+- name: docker
+  image: docker:dind
+  privileged: true
+  volumes:
+  - name: dockersock
+    path: /var/run
+
+volumes:
+- name: dockersock
+  temp: {}
